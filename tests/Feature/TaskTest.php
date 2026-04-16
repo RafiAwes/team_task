@@ -15,13 +15,16 @@ test('a user can create a task', function () {
         'status' => 'pending',
         'priority' => 'normal',
         'assignee_id' => $user->id,
+        'due_date' => '2026-05-01 10:00:00',
     ]);
 
     $response->assertRedirect();
     $this->assertDatabaseHas('tasks', [
         'title' => 'Test Task',
-        'creator_id' => $user->id, // Controller uses User::first() for now
+        'creator_id' => $user->id,
         'assignee_id' => $user->id,
+        'priority' => 'normal',
+        'due_date' => '2026-05-01 10:00:00',
     ]);
 });
 
