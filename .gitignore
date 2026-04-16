@@ -26,3 +26,6 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Security & Compliance
+!storage/app/ca/isrgrootx1.pem
