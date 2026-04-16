@@ -1,5 +1,5 @@
 # Unified Builder Stage
-FROM php:8.4-fpm-slim AS builder
+FROM php:8.4-fpm AS builder
 WORKDIR /app
 
 # Install system dependencies
