@@ -22,6 +22,7 @@ export function TaskModal({ isOpen, onClose, onSave, initialTask, users }: TaskM
     const [title, setTitle] = useState(initialTask?.title || '');
     const [description, setDescription] = useState(initialTask?.description || '');
     const [status, setStatus] = useState(initialTask?.status || 'pending');
+    const [priority, setPriority] = useState(initialTask?.priority || 'normal');
     const [assigneeName, setAssigneeName] = useState(initialTask?.assignee?.name || '');
 
     const handleSave = () => {
@@ -31,6 +32,7 @@ export function TaskModal({ isOpen, onClose, onSave, initialTask, users }: TaskM
             title,
             description,
             status,
+            priority,
             assignee,
             comments: initialTask?.comments || [],
         });
@@ -95,6 +97,20 @@ export function TaskModal({ isOpen, onClose, onSave, initialTask, users }: TaskM
                                 </SelectContent>
                             </Select>
                         </div>
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label className="text-xs font-bold uppercase tracking-wider text-text-muted">Priority</Label>
+                        <Select value={priority} onValueChange={(val: any) => setPriority(val)}>
+                            <SelectTrigger className="glass border-border/10">
+                                <SelectValue placeholder="Select priority" />
+                            </SelectTrigger>
+                            <SelectContent className="glass border-border/20">
+                                <SelectItem value="urgent">Urgent</SelectItem>
+                                <SelectItem value="important">Important</SelectItem>
+                                <SelectItem value="normal">Normal</SelectItem>
+                            </SelectContent>
+                        </Select>
                     </div>
                 </div>
 

@@ -11,6 +11,7 @@ import {
     DragOverEvent,
     DragEndEvent,
     defaultDropAnimationSideEffects,
+    useDroppable,
 } from '@dnd-kit/core';
 import {
     arrayMove,
@@ -40,6 +41,7 @@ export interface Task {
     title: string;
     description: string;
     status: string;
+    priority: 'urgent' | 'important' | 'normal';
     assignee: { name: string; avatar: string };
     comments: any[];
 }
@@ -162,23 +164,30 @@ export function KanbanBoard({ tasks: initialTasks }: KanbanBoardProps) {
 }
 
 function KanbanColumn({ column, tasks }: { column: Column; tasks: Task[] }) {
+    const { setNodeRef } = useDroppable({
+        id: column.id,
+    });
+
     return (
-        <div className="flex flex-col gap-4 h-full">
+        <div 
+            ref={setNodeRef}
+            className="flex flex-col gap-4 h-full min-h-[500px] p-2 rounded-2xl bg-white/[0.02] border border-white/[0.05] transition-colors"
+        >
             <div className="column-header">
                 <div className="flex items-center gap-2">
-                    <span>{column.title}</span>
-                    <span className="text-[10px] bg-white/10 px-1.5 py-0.5 rounded-full">{tasks.length}</span>
+                    <span className="text-text-main font-bold">{column.title}</span>
+                    <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded-full text-text-muted">{tasks.length}</span>
                 </div>
-                <button className="text-text-muted hover:text-cyan-accent">+</button>
+                <button className="text-text-muted hover:text-cyan-accent transition-colors">+</button>
             </div>
             
-            <SortableContext items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
+            <SortableContext id={column.id} items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
                 <div className="flex-1 flex flex-col gap-3">
                     {tasks.map((task) => (
                         <SortableTaskCard key={task.id} task={task} />
                     ))}
                     {tasks.length === 0 && (
-                        <div className="flex-1 border-2 border-dashed border-border/5 rounded-xl flex items-center justify-center text-text-muted text-[11px] italic min-h-[100px]">
+                        <div className="flex-1 border-2 border-dashed border-white/[0.03] rounded-xl flex items-center justify-center text-text-muted text-[11px] italic">
                             No tasks here
                         </div>
                     )}
@@ -215,11 +224,22 @@ function TaskCard({ task, isOverlay }: { task: Task; isOverlay?: boolean }) {
     const [showComments, setShowComments] = useState(false);
     const [newComment, setNewComment] = useState('');
 
+    const priorityColors = {
+        urgent: 'bg-rose-500/10 text-rose-500 border-rose-500/20 shadow-[0_0_10px_rgba(244,63,94,0.2)]',
+        important: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20 shadow-[0_0_10px_rgba(34,211,238,0.2)]',
+        normal: 'bg-slate-500/10 text-slate-400 border-slate-500/20',
+    };
+
     return (
         <div className={`glass glass-hover p-4 rounded-xl cursor-grab active:cursor-grabbing transition-all ${isOverlay ? 'shadow-2xl border-cyan-accent/50 scale-105' : ''}`}>
-            <div className="flex justify-between items-start mb-2 pointer-events-none">
-                <h3 className="card-title">{task.title}</h3>
-                <div className="ai-btn">AI</div>
+            <div className="flex justify-between items-start gap-3 mb-2 ">
+                <div className="flex flex-col gap-2 flex-1 pointer-events-none">
+                    <div className={`inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border w-fit ${priorityColors[task.priority || 'normal']}`}>
+                        {task.priority || 'normal'}
+                    </div>
+                    <h3 className="card-title">{task.title}</h3>
+                </div>
+                <div className="ai-btn flex-shrink-0">AI</div>
             </div>
             <p className="card-desc mb-4 pointer-events-none">{task.description}</p>
             
