@@ -280,6 +280,27 @@ function TaskCard({ task, isOverlay, onView, onEdit }: { task: Task; isOverlay?:
         normal: 'bg-slate-500/10 text-slate-400 border-slate-500/20',
     };
 
+    const postComment = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!newComment.trim()) return;
+
+        router.post(`/tasks/${task.id}/comments`, {
+            content: newComment
+        }, {
+            preserveScroll: true,
+            onSuccess: () => setNewComment(''),
+        });
+    };
+
+    const deleteComment = (commentId: number, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (window.confirm('Delete this comment?')) {
+            router.delete(`/comments/${commentId}`, {
+                preserveScroll: true,
+            });
+        }
+    };
+
     return (
         <div className={`glass glass-hover group p-4 rounded-xl cursor-grab active:cursor-grabbing transition-all ${isOverlay ? 'shadow-2xl border-cyan-accent/50 scale-105' : ''}`}>
             <div className="flex justify-between items-start gap-3 mb-2 ">
@@ -351,9 +372,20 @@ function TaskCard({ task, isOverlay, onView, onEdit }: { task: Task; isOverlay?:
                     <div className="flex flex-col gap-2.5 mb-4 max-h-[120px] overflow-y-auto pr-1 custom-scrollbar">
                         {task.comments && task.comments.length > 0 ? (
                             task.comments.map((c, i) => (
-                                <div key={i} className="text-[11px] text-text-muted bg-white/[0.03] p-2.5 rounded-xl border border-white/[0.05]">
-                                    <span className="font-bold text-cyan-accent/80 mr-1.5">{c.user}:</span> 
-                                    <span className="text-text-main/90">{c.text}</span>
+                                <div key={i} className="group/comment relative text-[11px] text-text-muted bg-white/[0.03] p-2.5 rounded-xl border border-white/[0.05]">
+                                    <div className="flex justify-between items-start mb-1">
+                                        <span className="font-bold text-cyan-accent/80">{c.user}</span>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-[9px] opacity-40 font-medium tracking-tight uppercase leading-none">{c.created_at}</span>
+                                            <button 
+                                                onClick={(e) => deleteComment(c.id, e)}
+                                                className="opacity-0 group-hover/comment:opacity-100 hover:text-rose-500 transition-all leading-none p-0.5"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <span className="text-text-main/90 leading-relaxed block">{c.content}</span>
                                 </div>
                             ))
                         ) : (
@@ -366,13 +398,19 @@ function TaskCard({ task, isOverlay, onView, onEdit }: { task: Task; isOverlay?:
                             value={newComment}
                             onPointerDown={(e) => e.stopPropagation()}
                             onChange={(e) => setNewComment(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    postComment(e as any);
+                                }
+                            }}
                             placeholder="Add a comment..."
                             className="flex-1 glass text-[11px] px-3 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-accent/30 border-border/10 placeholder:text-text-muted/50"
                         />
                         <button 
                             onPointerDown={(e) => e.stopPropagation()}
                             className="text-[10px] font-bold px-3 py-1.5 bg-cyan-accent/10 text-cyan-accent rounded-lg hover:bg-cyan-accent/20 border border-cyan-accent/20 transition-colors uppercase tracking-wider"
-                            onClick={(e) => { e.stopPropagation(); setNewComment(''); }}
+                            onClick={postComment}
                         >
                             Post
                         </button>

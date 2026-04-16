@@ -15,7 +15,7 @@ class TaskService
      */
     public function getAllTasks()
     {
-        return Task::with(['assignee', 'creator'])->latest()->get();
+        return Task::with(['assignee', 'creator', 'comments.user'])->latest()->get();
     }
 
     /**
@@ -55,7 +55,7 @@ class TaskService
                 $user->notify(new TaskActivity($user, $task->title, 'updated'));
             }
 
-            return $task->fresh(['assignee', 'creator']);
+            return $task->fresh(['assignee', 'creator', 'comments.user']);
         });
     }
 

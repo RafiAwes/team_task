@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Task } from './kanban-board';
+import { router } from '@inertiajs/react';
 
 interface TaskViewModalProps {
     isOpen: boolean;
@@ -75,6 +76,52 @@ export function TaskViewModal({ isOpen, onClose, task }: TaskViewModalProps) {
                                     {task.due_date ? new Date(task.due_date).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'No due date'}
                                 </span>
                             </div>
+                        </div>
+                    </div>
+
+                    <div className="space-y-4 pt-4 border-t border-border/10">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-text-muted flex items-center gap-2">
+                             Activity & Comments
+                            <span className="px-1.5 py-0.5 rounded-full bg-white/5 text-[10px]">{task.comments?.length || 0}</span>
+                        </h4>
+                        
+                        <div className="space-y-3 max-h-[250px] overflow-y-auto pr-2 custom-scrollbar">
+                            {task.comments && task.comments.length > 0 ? (
+                                task.comments.map((comment, index) => (
+                                    <div key={index} className="flex gap-3 bg-white/5 p-3 rounded-xl border border-white/5 group/modal-comment relative">
+                                        <div className="w-8 h-8 rounded-full bg-cyan-accent/10 flex items-center justify-center text-cyan-accent font-bold text-[10px] shrink-0 font-display">
+                                            {comment.avatar}
+                                        </div>
+                                        <div className="flex-1 space-y-1">
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[11px] font-bold text-text-main">{comment.user}</span>
+                                                <span className="text-[9px] text-text-muted uppercase tracking-wider">{comment.created_at}</span>
+                                            </div>
+                                            <p className="text-xs text-text-main/80 leading-relaxed font-display">{comment.content}</p>
+                                        </div>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-xs text-text-muted italic py-4 text-center">No comments yet. Start the conversation!</div>
+                            )}
+                        </div>
+
+                        <div className="flex gap-2 pt-2">
+                            <input 
+                                type="text" 
+                                placeholder="Add to the discussion..."
+                                className="flex-1 glass text-xs px-4 py-2 rounded-xl focus:outline-none focus:ring-1 focus:ring-cyan-accent/30 border-border/10 placeholder:text-text-muted/50"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && e.currentTarget.value.trim()) {
+                                        router.post(`/tasks/${task.id}/comments`, {
+                                            content: e.currentTarget.value
+                                        }, {
+                                            preserveScroll: true,
+                                            onSuccess: () => (e.currentTarget.value = ''),
+                                        });
+                                    }
+                                }}
+                            />
                         </div>
                     </div>
                 </div>
