@@ -71,7 +71,9 @@ export function TaskViewModal({ isOpen, onClose, task }: TaskViewModalProps) {
                         <div className="space-y-2">
                             <h4 className="text-xs font-bold uppercase tracking-wider text-text-muted">Due Date</h4>
                             <div className="flex items-center gap-3 bg-white/5 p-2 rounded-xl border border-white/5 h-[42px]">
-                                <span className="text-sm font-medium text-text-main px-2">Soon</span>
+                                <span className="text-sm font-medium text-text-main px-2">
+                                    {task.due_date ? new Date(task.due_date).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' }) : 'No due date'}
+                                </span>
                             </div>
                         </div>
                     </div>

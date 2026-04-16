@@ -25,16 +25,29 @@ export function TaskModal({ isOpen, onClose, initialTask, users }: TaskModalProp
         status: initialTask?.status || 'pending',
         priority: initialTask?.priority || 'normal',
         assignee_id: initialTask?.assignee?.id || '',
+        due_date: initialTask?.due_date || '',
     });
 
     useEffect(() => {
         if (initialTask) {
+            // Format date for datetime-local input (YYYY-MM-DDThh:mm)
+            let formattedDate = '';
+            if (initialTask.due_date) {
+                try {
+                    const date = new Date(initialTask.due_date);
+                    formattedDate = date.toISOString().slice(0, 16);
+                } catch (e) {
+                    formattedDate = '';
+                }
+            }
+
             setData({
                 title: initialTask.title || '',
                 description: initialTask.description || '',
                 status: initialTask.status || 'pending',
                 priority: (initialTask.priority as any) || 'normal',
                 assignee_id: initialTask.assignee?.id || '',
+                due_date: formattedDate,
             });
         } else {
             reset();
@@ -72,7 +85,7 @@ export function TaskModal({ isOpen, onClose, initialTask, users }: TaskModalProp
                         </DialogTitle>
                     </DialogHeader>
                     
-                    <div className="grid gap-6 py-4 relative z-10">
+                    <div className="grid gap-6 py-4 relative z-10 overflow-y-auto max-h-[60vh] pr-2 custom-scrollbar">
                         <div className="grid gap-2">
                             <Label htmlFor="title" className="text-xs font-bold uppercase tracking-wider text-text-muted">Title</Label>
                             <Input 
@@ -94,6 +107,7 @@ export function TaskModal({ isOpen, onClose, initialTask, users }: TaskModalProp
                                 placeholder="Add more details..."
                             />
                         </div>
+                        
                         <div className="grid grid-cols-2 gap-4">
                             <div className="grid gap-2">
                                 <Label className="text-xs font-bold uppercase tracking-wider text-text-muted">Status</Label>
@@ -109,6 +123,18 @@ export function TaskModal({ isOpen, onClose, initialTask, users }: TaskModalProp
                                 </Select>
                             </div>
                             <div className="grid gap-2">
+                                <Label className="text-xs font-bold uppercase tracking-wider text-text-muted">Due Date & Time</Label>
+                                <Input 
+                                    type="datetime-local" 
+                                    value={data.due_date} 
+                                    onChange={(e) => setData('due_date', e.target.value)}
+                                    className="glass border-border/10 focus-visible:ring-cyan-accent/30"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="grid gap-2">
                                 <Label className="text-xs font-bold uppercase tracking-wider text-text-muted">Assignee</Label>
                                 <Select value={data.assignee_id?.toString()} onValueChange={(val) => setData('assignee_id', val)}>
                                     <SelectTrigger className="glass border-border/10">
@@ -121,20 +147,19 @@ export function TaskModal({ isOpen, onClose, initialTask, users }: TaskModalProp
                                     </SelectContent>
                                 </Select>
                             </div>
-                        </div>
-
-                        <div className="grid gap-2">
-                            <Label className="text-xs font-bold uppercase tracking-wider text-text-muted">Priority</Label>
-                            <Select value={data.priority} onValueChange={(val: any) => setData('priority', val)}>
-                                <SelectTrigger className="glass border-border/10">
-                                    <SelectValue placeholder="Select priority" />
-                                </SelectTrigger>
-                                <SelectContent className="glass border-border/20">
-                                    <SelectItem value="urgent">Urgent</SelectItem>
-                                    <SelectItem value="important">Important</SelectItem>
-                                    <SelectItem value="normal">Normal</SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <div className="grid gap-2">
+                                <Label className="text-xs font-bold uppercase tracking-wider text-text-muted">Priority</Label>
+                                <Select value={data.priority} onValueChange={(val: any) => setData('priority', val)}>
+                                    <SelectTrigger className="glass border-border/10">
+                                        <SelectValue placeholder="Select priority" />
+                                    </SelectTrigger>
+                                    <SelectContent className="glass border-border/20">
+                                        <SelectItem value="urgent">Urgent</SelectItem>
+                                        <SelectItem value="important">Important</SelectItem>
+                                        <SelectItem value="normal">Normal</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
                     </div>
 

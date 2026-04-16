@@ -45,6 +45,7 @@ export interface Task {
     priority: 'urgent' | 'important' | 'normal';
     assignee?: { id: number; name: string; avatar: string; avatar_url?: string };
     comments: any[];
+    due_date?: string | null;
 }
 
 interface KanbanBoardProps {
