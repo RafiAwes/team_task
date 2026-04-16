@@ -36,13 +36,19 @@ RUN npm run build
 FROM serversideup/php:8.4-fpm-nginx AS final
 WORKDIR /var/www/html
 
-# Switch to root to ensure we can set permissions
+# Switch to root to ensure we can set permissions and download certs
 USER root
+
+# --- THE CRITICAL SSL FIX ---
+# Download the public Let's Encrypt cert required by TiDB and grant read access
+RUN curl -sSo /etc/ssl/certs/isrgrootx1.pem https://letsencrypt.org/certs/isrgrootx1.pem \
+    && chmod 644 /etc/ssl/certs/isrgrootx1.pem
+# ----------------------------
 
 # Environment variables for production
 ENV PHP_OPCACHE_ENABLE=1
 
-# CRITICAL FIX 1: Set to true. This allows the base image to safely run 'php artisan migrate --force' automatically.
+# Set to true to safely run 'php artisan migrate --force' automatically.
 ENV AUTORUN_ENABLED=true
 
 # Copy built application from builder
@@ -53,6 +59,3 @@ RUN chmod -R 775 storage bootstrap/cache
 
 # Expose the default PORT used by Render
 EXPOSE 8080
-
-# CRITICAL FIX 2: The custom ENTRYPOINT and entrypoint.sh COPY commands have been completely deleted.
-# The container will now rely on the robust s6-overlay process manager built into the ServerSideUp image.
