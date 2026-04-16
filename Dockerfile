@@ -36,6 +36,9 @@ RUN npm run build
 FROM serversideup/php:8.4-fpm-nginx AS final
 WORKDIR /var/www/html
 
+# Switch to root to ensure we can set permissions
+USER root
+
 # Environment variables for production
 ENV PHP_OPCACHE_ENABLE=1
 ENV AUTORUN_ENABLED=false
@@ -46,11 +49,12 @@ COPY --from=builder --chown=www-data:www-data /app .
 # Ensure storage and cache are writable
 RUN chmod -R 775 storage bootstrap/cache
 
-# Expose the default PORT used by Render
-EXPOSE 8080
-
 # Use our custom entrypoint
 COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh && \
+    sed -i 's/\r$//' /usr/local/bin/entrypoint.sh
+
+# Expose the default PORT used by Render
+EXPOSE 8080
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
