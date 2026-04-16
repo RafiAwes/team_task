@@ -2,7 +2,7 @@
 FROM php:8.4-fpm AS builder
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies (curl is installed here!)
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -11,6 +11,10 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
+
+# --- CRITICAL FIX: Download the cert in the builder stage ---
+RUN curl -sSo /app/isrgrootx1.pem https://letsencrypt.org/certs/isrgrootx1.pem
+# ------------------------------------------------------------
 
 # Install Node.js
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
@@ -36,20 +40,16 @@ RUN npm run build
 FROM serversideup/php:8.4-fpm-nginx AS final
 WORKDIR /var/www/html
 
-# Switch to root to ensure we can set permissions and download certs
+# Switch to root to ensure we can set permissions
 USER root
 
-# --- THE CRITICAL SSL FIX ---
-# Download the public Let's Encrypt cert required by TiDB to the location Laravel expects
-RUN mkdir -p storage/app/ca && \
-    curl -sSo storage/app/ca/isrgrootx1.pem https://letsencrypt.org/certs/isrgrootx1.pem && \
-    chmod 644 storage/app/ca/isrgrootx1.pem
-# ----------------------------
+# --- CRITICAL FIX: Copy the cert from the builder stage ---
+COPY --from=builder /app/isrgrootx1.pem /etc/ssl/certs/isrgrootx1.pem
+RUN chmod 644 /etc/ssl/certs/isrgrootx1.pem
+# ----------------------------------------------------------
 
 # Environment variables for production
 ENV PHP_OPCACHE_ENABLE=1
-
-# Set to true to safely run 'php artisan migrate --force' automatically.
 ENV AUTORUN_ENABLED=true
 
 # Copy built application from builder
@@ -60,10 +60,3 @@ RUN chmod -R 775 storage bootstrap/cache
 
 # Expose the default PORT used by Render
 EXPOSE 8080
-
-# Use our custom entrypoint
-COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh && \
-    sed -i 's/\r$//' /usr/local/bin/entrypoint.sh
-
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
