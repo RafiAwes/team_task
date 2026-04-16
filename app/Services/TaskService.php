@@ -31,7 +31,12 @@ class TaskService
     public function updateTask(Task $task, array $data): Task
     {
         return DB::transaction(function () use ($task, $data) {
-            $task->update($data);
+            // Remove null or empty string values as per user request to "keep previous data"
+            $filteredData = array_filter($data, function ($value) {
+                return $value !== null && $value !== '';
+            });
+
+            $task->update($filteredData);
             return $task->fresh(['assignee', 'creator']);
         });
     }

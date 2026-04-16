@@ -1,3 +1,4 @@
+import React, { useEffect } from 'react';
 import { useForm } from '@inertiajs/react';
 import {
     Dialog,
@@ -25,6 +26,20 @@ export function TaskModal({ isOpen, onClose, initialTask, users }: TaskModalProp
         priority: initialTask?.priority || 'normal',
         assignee_id: initialTask?.assignee?.id || '',
     });
+
+    useEffect(() => {
+        if (initialTask) {
+            setData({
+                title: initialTask.title || '',
+                description: initialTask.description || '',
+                status: initialTask.status || 'pending',
+                priority: (initialTask.priority as any) || 'normal',
+                assignee_id: initialTask.assignee?.id || '',
+            });
+        } else {
+            reset();
+        }
+    }, [initialTask]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
