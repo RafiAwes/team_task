@@ -4,6 +4,7 @@ import { useState } from 'react';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { KanbanBoard, Task } from '@/components/kanban/kanban-board';
 import { TaskModal } from '@/components/kanban/task-modal';
+import { TaskViewModal } from '@/components/kanban/task-view-modal';
 
 interface MyTasksProps {
     tasks: { data: Task[] };
@@ -13,11 +14,18 @@ interface MyTasksProps {
 export default function MyTasks({ tasks: initialTasks, users }: MyTasksProps) {
     const tasks = initialTasks.data;
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isViewModalOpen, setIsViewModalOpen] = useState(false);
     const [editingTask, setEditingTask] = useState<Task | undefined>();
+    const [viewingTask, setViewingTask] = useState<Task | undefined>();
 
     const handleEditTask = (task: Task) => {
         setEditingTask(task);
         setIsModalOpen(true);
+    };
+
+    const handleViewTask = (task: Task) => {
+        setViewingTask(task);
+        setIsViewModalOpen(true);
     };
 
     return (
@@ -34,13 +42,19 @@ export default function MyTasks({ tasks: initialTasks, users }: MyTasksProps) {
                     </div>
                 </header>
 
-                <KanbanBoard tasks={tasks} onEdit={handleEditTask} />
+                <KanbanBoard tasks={tasks} onView={handleViewTask} onEdit={handleEditTask} />
 
                 <TaskModal 
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
                     initialTask={editingTask}
                     users={users}
+                />
+
+                <TaskViewModal 
+                    isOpen={isViewModalOpen}
+                    onClose={() => setIsViewModalOpen(false)}
+                    task={viewingTask}
                 />
             </div>
         </DashboardLayout>

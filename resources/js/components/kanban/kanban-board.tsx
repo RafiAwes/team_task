@@ -49,10 +49,11 @@ export interface Task {
 
 interface KanbanBoardProps {
     tasks: Task[];
+    onView?: (task: Task) => void;
     onEdit?: (task: Task) => void;
 }
 
-export function KanbanBoard({ tasks: initialTasks, onEdit }: KanbanBoardProps) {
+export function KanbanBoard({ tasks: initialTasks, onView, onEdit }: KanbanBoardProps) {
     const { searchQuery } = useSearch();
     const [tasks, setTasks] = useState<Task[]>(initialTasks);
 
@@ -171,6 +172,7 @@ export function KanbanBoard({ tasks: initialTasks, onEdit }: KanbanBoardProps) {
                         key={column.id} 
                         column={column} 
                         tasks={filteredTasks.filter(t => t.status === column.id)} 
+                        onView={onView}
                         onEdit={onEdit}
                     />
                 ))}
@@ -189,7 +191,7 @@ export function KanbanBoard({ tasks: initialTasks, onEdit }: KanbanBoardProps) {
     );
 }
 
-function KanbanColumn({ column, tasks, onEdit }: { column: Column; tasks: Task[]; onEdit?: (task: Task) => void }) {
+function KanbanColumn({ column, tasks, onView, onEdit }: { column: Column; tasks: Task[]; onView?: (task: Task) => void; onEdit?: (task: Task) => void }) {
     const { setNodeRef } = useDroppable({
         id: column.id,
     });
@@ -210,7 +212,7 @@ function KanbanColumn({ column, tasks, onEdit }: { column: Column; tasks: Task[]
             <SortableContext id={column.id} items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
                 <div className="flex-1 flex flex-col gap-3">
                     {tasks.map((task) => (
-                        <SortableTaskCard key={task.id} task={task} onEdit={onEdit} />
+                        <SortableTaskCard key={task.id} task={task} onView={onView} onEdit={onEdit} />
                     ))}
                     {tasks.length === 0 && (
                         <div className="flex-1 border-2 border-dashed border-white/[0.03] rounded-xl flex items-center justify-center text-text-muted text-[11px] italic">
@@ -223,7 +225,7 @@ function KanbanColumn({ column, tasks, onEdit }: { column: Column; tasks: Task[]
     );
 }
 
-function SortableTaskCard({ task, onEdit }: { task: Task; onEdit?: (task: Task) => void }) {
+function SortableTaskCard({ task, onView, onEdit }: { task: Task; onView?: (task: Task) => void; onEdit?: (task: Task) => void }) {
     const {
         attributes,
         listeners,
@@ -241,12 +243,12 @@ function SortableTaskCard({ task, onEdit }: { task: Task; onEdit?: (task: Task) 
 
     return (
         <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-            <TaskCard task={task} onEdit={onEdit} />
+            <TaskCard task={task} onView={onView} onEdit={onEdit} />
         </div>
     );
 }
 
-function TaskCard({ task, isOverlay, onEdit }: { task: Task; isOverlay?: boolean; onEdit?: (task: Task) => void }) {
+function TaskCard({ task, isOverlay, onView, onEdit }: { task: Task; isOverlay?: boolean; onView?: (task: Task) => void; onEdit?: (task: Task) => void }) {
     const [showComments, setShowComments] = useState(false);
     const [newComment, setNewComment] = useState('');
 
@@ -278,13 +280,23 @@ function TaskCard({ task, isOverlay, onEdit }: { task: Task; isOverlay?: boolean
                         )}
                     </div>
                     
-                    <button 
-                        onPointerDown={(e) => e.stopPropagation()}
-                        onClick={(e) => { e.stopPropagation(); onEdit?.(task); }}
-                        className="text-[10px] font-bold text-text-muted hover:text-white transition-colors uppercase tracking-wider bg-white/5 px-2 py-1 rounded-md border border-white/5 active:scale-95"
-                    >
-                        Details
-                    </button>
+                    <div className="flex items-center gap-2">
+                        <button 
+                            onPointerDown={(e) => e.stopPropagation()}
+                            onClick={(e) => { e.stopPropagation(); onView?.(task); }}
+                            className="text-[10px] font-bold text-text-muted hover:text-cyan-accent transition-colors uppercase tracking-wider"
+                        >
+                            Details
+                        </button>
+                        <span className="w-1 h-1 rounded-full bg-white/10" />
+                        <button 
+                            onPointerDown={(e) => e.stopPropagation()}
+                            onClick={(e) => { e.stopPropagation(); onEdit?.(task); }}
+                            className="text-[10px] font-bold text-text-muted hover:text-purple-accent transition-colors uppercase tracking-wider"
+                        >
+                            Edit
+                        </button>
+                    </div>
                 </div>
                 
                 <div className="flex items-center gap-2 text-text-muted text-[10px]">
