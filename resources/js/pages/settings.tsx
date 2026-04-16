@@ -1,10 +1,11 @@
 import { Head } from '@inertiajs/react';
+import { settings as settingsRoute } from '@/routes';
 import DashboardLayout from '@/layouts/dashboard-layout';
 
 export default function Settings() {
     return (
         <DashboardLayout 
-            breadcrumbs={[{ title: 'Settings', href: route('settings') }]}
+            breadcrumbs={[{ title: 'Settings', href: settingsRoute() }]}
         >
             <Head title="Settings" />
             
@@ -31,7 +32,7 @@ export default function Settings() {
                     <div className="glass p-6 rounded-2xl flex flex-col gap-4">
                         <h2 className="text-lg font-semibold text-purple-accent">Notification Settings</h2>
                         <p className="text-sm text-text-muted">Manage how you receive updates on your tasks and comments.</p>
-                        <button className="btn-secondary w-full">Manage Notifications</button>
+                        <button className="bg-white/5 hover:bg-white/10 text-text-main px-4 py-2 rounded-xl border border-border transition-all w-full text-sm font-medium">Manage Notifications</button>
                     </div>
                 </div>
             </div>
