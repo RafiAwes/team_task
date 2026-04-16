@@ -10,7 +10,7 @@ interface MyTasksProps {
 export default function MyTasks({ tasks }: MyTasksProps) {
     return (
         <DashboardLayout 
-            breadcrumbs={[{ title: 'My Tasks', href: '/my-tasks' }]}
+            breadcrumbs={[{ title: 'My Tasks', href: '/tasks' }]}
         >
             <Head title="My Tasks" />
             
