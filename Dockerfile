@@ -40,9 +40,10 @@ WORKDIR /var/www/html
 USER root
 
 # --- THE CRITICAL SSL FIX ---
-# Download the public Let's Encrypt cert required by TiDB and grant read access
-RUN curl -sSo /etc/ssl/certs/isrgrootx1.pem https://letsencrypt.org/certs/isrgrootx1.pem \
-    && chmod 644 /etc/ssl/certs/isrgrootx1.pem
+# Download the public Let's Encrypt cert required by TiDB to the location Laravel expects
+RUN mkdir -p storage/app/ca && \
+    curl -sSo storage/app/ca/isrgrootx1.pem https://letsencrypt.org/certs/isrgrootx1.pem && \
+    chmod 644 storage/app/ca/isrgrootx1.pem
 # ----------------------------
 
 # Environment variables for production
@@ -59,3 +60,10 @@ RUN chmod -R 775 storage bootstrap/cache
 
 # Expose the default PORT used by Render
 EXPOSE 8080
+
+# Use our custom entrypoint
+COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh && \
+    sed -i 's/\r$//' /usr/local/bin/entrypoint.sh
+
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

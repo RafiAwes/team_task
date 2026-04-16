@@ -3,7 +3,7 @@ services:
     name: team-task
     env: docker
     plan: free # Change to starter or higher for better performance
-    region: singapore # Adjust based on your TiDB region
+    region: ohio # TiDB is in Ohio (us-east-2)
     healthCheckPath: /
     dockerfilePath: ./Dockerfile
     envVars:
@@ -11,6 +11,8 @@ services:
         value: production
       - key: APP_DEBUG
         value: false
+      - key: APP_URL
+        sync: false # Set this to your Render URL (e.g., https://team-task.onrender.com)
       - key: APP_KEY
         fromContext: "static" # You must set this in Render Dashboard manually or here if you have it
       - key: DB_CONNECTION
