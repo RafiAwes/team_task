@@ -1,4 +1,3 @@
-declare function route(name: string, params?: any): string;
 import { useForm } from '@inertiajs/react';
 import {
     Dialog,
@@ -31,14 +30,10 @@ export function TaskModal({ isOpen, onClose, initialTask, users }: TaskModalProp
         e.preventDefault();
         
         if (initialTask) {
-            put(route('tasks.update', initialTask.id), {
-                onSuccess: () => {
-                    onClose();
-                    reset();
-                },
-            });
+            // put(`/tasks/${initialTask.id}`, { ... })
+            onClose();
         } else {
-            post(route('tasks.store'), {
+            post('/tasks', {
                 onSuccess: () => {
                     onClose();
                     reset();

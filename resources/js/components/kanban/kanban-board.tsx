@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     DndContext,
     DragOverlay,
@@ -37,12 +37,12 @@ const columns: Column[] = [
 ];
 
 export interface Task {
-    id: string;
+    id: string | number;
     title: string;
     description: string;
     status: string;
     priority: 'urgent' | 'important' | 'normal';
-    assignee: { name: string; avatar: string };
+    assignee?: { id: number; name: string; avatar: string; avatar_url?: string };
     comments: any[];
 }
 
@@ -53,6 +53,10 @@ interface KanbanBoardProps {
 export function KanbanBoard({ tasks: initialTasks }: KanbanBoardProps) {
     const { searchQuery } = useSearch();
     const [tasks, setTasks] = useState<Task[]>(initialTasks);
+
+    useEffect(() => {
+        setTasks(initialTasks);
+    }, [initialTasks]);
     // ... rest of the component
     const [activeTask, setActiveTask] = useState<Task | null>(null);
 
@@ -245,9 +249,11 @@ function TaskCard({ task, isOverlay }: { task: Task; isOverlay?: boolean }) {
             
             <div className="flex items-center justify-between">
                 <div className="flex -space-x-2">
-                    <div className="avatar ring-2 ring-bg">
-                        {task.assignee.avatar}
-                    </div>
+                    {task.assignee && (
+                        <div className="avatar ring-2 ring-bg">
+                            {task.assignee.avatar}
+                        </div>
+                    )}
                 </div>
                 
                 <div className="flex items-center gap-2 text-text-muted text-[10px]">
