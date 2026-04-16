@@ -1,22 +1,36 @@
-# Stage 1: Build Frontend
-FROM node:20-slim AS build-frontend
+# Unified Builder Stage
+FROM php:8.4-fpm-slim AS builder
 WORKDIR /app
-# Install build tools for native modules (needed by some Tailwind/Vite plugins)
-RUN apt-get update && apt-get install -y build-essential python3 && rm -rf /var/lib/apt/lists/*
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build
 
-# Stage 2: Build Backend
-FROM php:8.4-fpm-alpine AS build-backend
-WORKDIR /app
-COPY composer*.json ./
-RUN apk add --no-cache git unzip libzip-dev \
-    && docker-php-ext-install zip pdo_mysql bcmath
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    libzip-dev \
+    curl \
+    gnupg \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs
+
+# Install PHP extensions
+RUN docker-php-ext-install zip pdo_mysql bcmath
+
+# Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Copy application files
 COPY . .
+
+# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
+
+# Install Node dependencies and build
+RUN npm install
+RUN npm run build
 
 # Final Stage: Production Environment
 FROM serversideup/php:8.4-fpm-nginx AS final
@@ -26,11 +40,8 @@ WORKDIR /var/www/html
 ENV PHP_OPCACHE_ENABLE=1
 ENV AUTORUN_ENABLED=false
 
-# Copy PHP backend
-COPY --from=build-backend --chown=www-data:www-data /app .
-
-# Copy Frontend assets
-COPY --from=build-frontend --chown=www-data:www-data /app/public/build ./public/build
+# Copy built application from builder
+COPY --from=builder --chown=www-data:www-data /app .
 
 # Ensure storage and cache are writable
 RUN chmod -R 775 storage bootstrap/cache
