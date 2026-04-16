@@ -6,12 +6,12 @@ import { KanbanBoard, Task } from '@/components/kanban/kanban-board';
 import { TaskModal } from '@/components/kanban/task-modal';
 
 interface Props {
-    tasks: Task[];
-    users: { name: string; avatar: string }[];
+    tasks: { data: Task[] }; // From TaskResource::collection
+    users: { id: number; name: string; avatar: string; avatar_url?: string }[];
 }
 
 export default function Dashboard({ tasks: initialTasks, users }: Props) {
-    const [tasks, setTasks] = useState<Task[]>(initialTasks);
+    const tasks = initialTasks.data;
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingTask, setEditingTask] = useState<Task | undefined>();
 
@@ -20,17 +20,7 @@ export default function Dashboard({ tasks: initialTasks, users }: Props) {
         setIsModalOpen(true);
     };
 
-    const handleSaveTask = (task: Task) => {
-        setTasks((prev) => {
-            const index = prev.findIndex((t) => t.id === task.id);
-            if (index > -1) {
-                const updated = [...prev];
-                updated[index] = task;
-                return updated;
-            }
-            return [...prev, task];
-        });
-    };
+    // Removed handleSaveTask as Inertia's useForm will handle the refresh
 
     return (
         <DashboardLayout 
@@ -56,7 +46,6 @@ export default function Dashboard({ tasks: initialTasks, users }: Props) {
                 <TaskModal 
                     isOpen={isModalOpen}
                     onClose={() => setIsModalOpen(false)}
-                    onSave={handleSaveTask}
                     initialTask={editingTask}
                     users={users}
                 />

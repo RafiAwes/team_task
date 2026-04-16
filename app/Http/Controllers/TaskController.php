@@ -2,76 +2,59 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTaskRequest;
+use App\Http\Resources\TaskResource;
+use App\Models\User;
+use App\Services\TaskService;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 
 class TaskController extends Controller
 {
-    private function getMockTasks()
+    protected $taskService;
+
+    public function __construct(TaskService $taskService)
     {
-        return [
-            [
-                'id' => '1',
-                'title' => 'Design System Implementation',
-                'description' => 'Implement the Elegant Dark theme tokens in Tailwind v4.',
-                'status' => 'completed',
-                'priority' => 'important',
-                'assignee' => ['name' => 'Alex Rivera', 'avatar' => 'AR'],
-                'comments' => [
-                    ['id' => 'c1', 'user' => 'Sarah Chen', 'text' => 'Looks amazing! Love the neon accents.'],
-                ],
-            ],
-            [
-                'id' => '2',
-                'title' => 'Kanban Drag & Drop',
-                'description' => 'Setup @dnd-kit for smooth task transitions between columns.',
-                'status' => 'in-progress',
-                'priority' => 'urgent',
-                'assignee' => ['name' => 'Jordan Lee', 'avatar' => 'JL'],
-                'comments' => [],
-            ],
-            [
-                'id' => '3',
-                'title' => 'Task Edit Modal',
-                'description' => 'Create a unified modal for editing task details and comments.',
-                'status' => 'pending',
-                'priority' => 'normal',
-                'assignee' => ['name' => 'Alex Rivera', 'avatar' => 'AR'],
-                'comments' => [],
-            ],
-            [
-                'id' => '4',
-                'title' => 'Search & Filter Logic',
-                'description' => 'Implement real-time search across task titles and descriptions.',
-                'status' => 'pending',
-                'priority' => 'important',
-                'assignee' => ['name' => 'Mila Kunis', 'avatar' => 'MK'],
-                'comments' => [],
-            ],
-        ];
+        $this->taskService = $taskService;
     }
 
     public function dashboard()
     {
+        $tasks = $this->taskService->getAllTasks();
+        $users = User::all(['id', 'name', 'avatar_url']);
+
         return Inertia::render('dashboard', [
-            'tasks' => $this->getMockTasks(),
-            'users' => [
-                ['name' => 'Alex Rivera', 'avatar' => 'AR'],
-                ['name' => 'Jordan Lee', 'avatar' => 'JL'],
-                ['name' => 'Sarah Chen', 'avatar' => 'SC'],
-                ['name' => 'Mila Kunis', 'avatar' => 'MK'],
-            ],
+            'tasks' => TaskResource::collection($tasks),
+            'users' => $users->map(fn($u) => [
+                'id' => $u->id,
+                'name' => $u->name,
+                'avatar' => $u->name[0],
+                'avatar_url' => $u->avatar_url,
+            ]),
         ]);
+    }
+
+    public function store(StoreTaskRequest $request)
+    {
+        // For now, since auth is removed, we treat the first user as the creator
+        $creator = User::first();
+        
+        $data = $request->validated();
+        $data['creator_id'] = $creator->id;
+
+        $task = $this->taskService->createTask($data);
+
+        return redirect()->back()->with('success', 'Task created successfully.');
     }
 
     public function myTasks()
     {
-        $allTasks = $this->getMockTasks();
-        // Filter for Alex Rivera (acting as current user)
-        $myTasks = array_values(array_filter($allTasks, fn($t) => $t['assignee']['name'] === 'Alex Rivera'));
+        // Mock current user as the first user
+        $user = User::first();
+        $tasks = $this->taskService->getAllTasks()->where('assignee_id', $user->id);
 
         return Inertia::render('my-tasks', [
-            'tasks' => $myTasks,
+            'tasks' => TaskResource::collection($tasks),
         ]);
     }
 
