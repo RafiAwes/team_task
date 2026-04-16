@@ -1,11 +1,11 @@
 import { Head } from '@inertiajs/react';
-import { settings as settingsRoute } from '@/routes';
+
 import DashboardLayout from '@/layouts/dashboard-layout';
 
 export default function Settings() {
     return (
         <DashboardLayout 
-            breadcrumbs={[{ title: 'Settings', href: settingsRoute() }]}
+            breadcrumbs={[{ title: 'Settings', href: '/settings' }]}
         >
             <Head title="Settings" />
             

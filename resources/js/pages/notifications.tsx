@@ -1,6 +1,6 @@
 import { Head } from '@inertiajs/react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { notifications as notificationsRoute } from '@/routes';
+
 import DashboardLayout from '@/layouts/dashboard-layout';
 
 interface Notification {
@@ -18,7 +18,7 @@ interface NotificationsProps {
 export default function Notifications({ notifications }: NotificationsProps) {
     return (
         <DashboardLayout 
-            breadcrumbs={[{ title: 'Notifications', href: notificationsRoute() }]}
+            breadcrumbs={[{ title: 'Notifications', href: '/notifications' }]}
         >
             <Head title="Notifications" />
             

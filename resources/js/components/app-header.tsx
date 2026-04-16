@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/tooltip';
 import { useCurrentUrl } from '@/hooks/use-current-url';
 import { cn, toUrl } from '@/lib/utils';
-import { dashboard } from '@/routes';
+
 import type { BreadcrumbItem, NavItem } from '@/types';
 
 type Props = {
@@ -34,7 +34,7 @@ type Props = {
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: dashboard(),
+        href: '/dashboard',
         icon: LayoutGrid,
     },
 ];
@@ -105,7 +105,7 @@ export function AppHeader({ breadcrumbs = [] }: Props) {
                         </Sheet>
                     </div>
 
-                    <Link href={dashboard()} prefetch className="flex items-center space-x-2">
+                    <Link href="/dashboard" prefetch className="flex items-center space-x-2">
                         <AppLogo />
                     </Link>
 
