@@ -9,6 +9,7 @@ Route::get('/', function () {
 
 Route::get('/dashboard', [TaskController::class, 'dashboard'])->name('dashboard');
 Route::post('/tasks', [TaskController::class, 'store'])->name('tasks.store');
+Route::put('/tasks/{task}', [TaskController::class, 'update'])->name('tasks.update');
 Route::get('/tasks', [TaskController::class, 'myTasks'])->name('tasks.mine');
 Route::get('/notifications', [TaskController::class, 'notifications'])->name('notifications');
 Route::get('/settings', [TaskController::class, 'settings'])->name('settings');

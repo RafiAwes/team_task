@@ -30,8 +30,12 @@ export function TaskModal({ isOpen, onClose, initialTask, users }: TaskModalProp
         e.preventDefault();
         
         if (initialTask) {
-            // put(`/tasks/${initialTask.id}`, { ... })
-            onClose();
+            put(`/tasks/${initialTask.id}`, {
+                onSuccess: () => {
+                    onClose();
+                    reset();
+                },
+            });
         } else {
             post('/tasks', {
                 onSuccess: () => {

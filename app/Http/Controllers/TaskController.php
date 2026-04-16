@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreTaskRequest;
+use App\Http\Requests\UpdateTaskRequest;
 use App\Http\Resources\TaskResource;
+use App\Models\Task;
 use App\Models\User;
 use App\Services\TaskService;
 use Inertia\Inertia;
@@ -45,6 +47,13 @@ class TaskController extends Controller
         $task = $this->taskService->createTask($data);
 
         return redirect()->back()->with('success', 'Task created successfully.');
+    }
+
+    public function update(UpdateTaskRequest $request, Task $task)
+    {
+        $this->taskService->updateTask($task, $request->validated());
+
+        return redirect()->back()->with('success', 'Task updated successfully.');
     }
 
     public function myTasks()

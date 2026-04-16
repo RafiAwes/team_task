@@ -24,6 +24,7 @@ import { usePage } from '@inertiajs/react';
 import { SearchProvider, useSearch } from '@/contexts/search-context';
 import { CSS } from '@dnd-kit/utilities';
 import { motion, AnimatePresence } from 'framer-motion';
+import { router } from '@inertiajs/react';
 
 interface Column {
     id: string;
@@ -121,10 +122,28 @@ export function KanbanBoard({ tasks: initialTasks, onEdit }: KanbanBoardProps) {
             return;
         }
 
-        if (active.id !== over.id) {
-            const activeIndex = tasks.findIndex((t) => t.id === active.id);
-            const overIndex = tasks.findIndex((t) => t.id === over.id);
+        const activeId = active.id;
+        const overId = over.id;
+
+        const activeTaskInList = tasks.find((t) => t.id === activeId);
+        
+        if (activeId !== overId) {
+            const activeIndex = tasks.findIndex((t) => t.id === activeId);
+            const overIndex = tasks.findIndex((t) => t.id === overId);
             
+            // Determine the new status
+            const overTask = tasks.find((t) => t.id === overId);
+            const newStatus = overTask ? overTask.status : (columns.find(c => c.id === overId)?.id as string);
+
+            if (activeTaskInList && newStatus && activeTaskInList.status !== newStatus) {
+                // Persist to backend
+                router.put(`/tasks/${activeId}`, {
+                    status: newStatus
+                }, {
+                    preserveScroll: true,
+                });
+            }
+
             if (activeIndex > -1 && overIndex > -1 && tasks[activeIndex].status === tasks[overIndex]?.status) {
                 setTasks((items) => arrayMove(items, activeIndex, overIndex));
             }
