@@ -17,6 +17,10 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('role')->default('member'); // admin, manager, member
+            $table->string('avatar_url')->nullable();
+            $table->string('status')->default('active'); // active, inactive, suspended
+            $table->text('bio')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
