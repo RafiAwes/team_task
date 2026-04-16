@@ -19,6 +19,8 @@ import {
     verticalListSortingStrategy,
     useSortable,
 } from '@dnd-kit/sortable';
+import { usePage } from '@inertiajs/react';
+import { SearchProvider, useSearch } from '@/contexts/search-context';
 import { CSS } from '@dnd-kit/utilities';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -47,7 +49,9 @@ interface KanbanBoardProps {
 }
 
 export function KanbanBoard({ tasks: initialTasks }: KanbanBoardProps) {
+    const { searchQuery } = useSearch();
     const [tasks, setTasks] = useState<Task[]>(initialTasks);
+    // ... rest of the component
     const [activeTask, setActiveTask] = useState<Task | null>(null);
 
     const sensors = useSensors(
@@ -121,6 +125,11 @@ export function KanbanBoard({ tasks: initialTasks }: KanbanBoardProps) {
         setActiveTask(null);
     }
 
+    const filteredTasks = tasks.filter(t => 
+        t.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        t.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
     return (
         <DndContext
             sensors={sensors}
@@ -134,7 +143,7 @@ export function KanbanBoard({ tasks: initialTasks }: KanbanBoardProps) {
                     <KanbanColumn 
                         key={column.id} 
                         column={column} 
-                        tasks={tasks.filter(t => t.status === column.id)} 
+                        tasks={filteredTasks.filter(t => t.status === column.id)} 
                     />
                 ))}
             </div>

@@ -5,6 +5,7 @@ import { Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ReactNode } from 'react';
 import { usePage } from '@inertiajs/react';
+import { SearchProvider, useSearch } from '@/contexts/search-context';
 
 interface Props {
     children: ReactNode;
@@ -12,7 +13,18 @@ interface Props {
 }
 
 export default function DashboardLayout({ children, breadcrumbs }: Props) {
+    return (
+        <SearchProvider>
+            <DashboardLayoutContent breadcrumbs={breadcrumbs}>
+                {children}
+            </DashboardLayoutContent>
+        </SearchProvider>
+    );
+}
+
+function DashboardLayoutContent({ children, breadcrumbs }: Props) {
     const { url } = usePage();
+    const { searchQuery, setSearchQuery } = useSearch();
 
     return (
         <SidebarProvider>
@@ -31,6 +43,8 @@ export default function DashboardLayout({ children, breadcrumbs }: Props) {
                                 <input 
                                     type="text" 
                                     placeholder="Search tasks..." 
+                                    value={searchQuery}
+                                    onChange={(e) => setSearchQuery(e.target.value)}
                                     className="h-10 w-64 glass rounded-full pl-10 pr-4 text-xs font-medium text-text-main focus:outline-none focus:ring-1 focus:ring-cyan-accent/30 transition-all"
                                 />
                             </div>
