@@ -3,7 +3,10 @@
 namespace App\Services;
 
 use App\Models\Task;
+use App\Models\User;
+use App\Notifications\TaskActivity;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class TaskService
 {
@@ -21,7 +24,15 @@ class TaskService
     public function createTask(array $data): Task
     {
         return DB::transaction(function () use ($data) {
-            return Task::create($data);
+            $task = Task::create($data);
+            
+            // Notify system of creation
+            $user = User::find($data['creator_id']) ?? User::first();
+            if ($user) {
+                $user->notify(new TaskActivity($user, $task->title, 'created'));
+            }
+
+            return $task;
         });
     }
 
@@ -37,6 +48,13 @@ class TaskService
             });
 
             $task->update($filteredData);
+            
+            // Notify system of update
+            $user = User::first(); // Mock actor
+            if ($user) {
+                $user->notify(new TaskActivity($user, $task->title, 'updated'));
+            }
+
             return $task->fresh(['assignee', 'creator']);
         });
     }
@@ -46,6 +64,12 @@ class TaskService
      */
     public function deleteTask(Task $task): bool
     {
+        // Notify system before deletion
+        $user = User::first(); // Mock actor
+        if ($user) {
+            $user->notify(new TaskActivity($user, $task->title, 'deleted'));
+        }
+
         return $task->delete();
     }
 }

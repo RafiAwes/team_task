@@ -45,7 +45,10 @@ export default function Notifications({ notifications }: NotificationsProps) {
                                 <div className="flex-1">
                                     <p className="text-sm text-text-main">
                                         <span className="font-bold text-cyan-accent">{n.user}</span> 
-                                        {n.type === 'comment' ? ' commented on ' : ' updated status of '}
+                                        {n.type === 'created' ? ' created a new task ' : 
+                                         n.type === 'updated' ? ' updated the task ' : 
+                                         n.type === 'deleted' ? ' deleted the task ' : 
+                                         n.type === 'comment' ? ' commented on ' : ' updated '}
                                         <span className="font-semibold text-purple-accent">"{n.task}"</span>
                                     </p>
                                     <p className="text-[11px] text-text-muted mt-1">{n.time}</p>

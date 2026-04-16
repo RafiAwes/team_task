@@ -95,11 +95,23 @@ class TaskController extends Controller
 
     public function notifications()
     {
+        $notifications = \Illuminate\Support\Facades\DB::table('notifications')
+            ->latest()
+            ->limit(20)
+            ->get()
+            ->map(function ($n) {
+                $data = json_decode($n->data, true);
+                return [
+                    'id' => $n->id,
+                    'type' => $data['type'] ?? 'update',
+                    'user' => $data['user'] ?? 'System',
+                    'task' => $data['task'] ?? 'Task',
+                    'time' => \Carbon\Carbon::parse($n->created_at)->diffForHumans(),
+                ];
+            });
+
         return Inertia::render('notifications', [
-            'notifications' => [
-                ['id' => 1, 'type' => 'comment', 'user' => 'Sarah Chen', 'task' => 'Design System Implementation', 'time' => '2 hours ago'],
-                ['id' => 2, 'type' => 'status', 'user' => 'Jordan Lee', 'task' => 'Kanban Drag & Drop', 'time' => '5 hours ago'],
-            ],
+            'notifications' => $notifications,
         ]);
     }
 
