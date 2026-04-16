@@ -41,7 +41,9 @@ USER root
 
 # Environment variables for production
 ENV PHP_OPCACHE_ENABLE=1
-ENV AUTORUN_ENABLED=false
+
+# CRITICAL FIX 1: Set to true. This allows the base image to safely run 'php artisan migrate --force' automatically.
+ENV AUTORUN_ENABLED=true
 
 # Copy built application from builder
 COPY --from=builder --chown=www-data:www-data /app .
@@ -49,12 +51,8 @@ COPY --from=builder --chown=www-data:www-data /app .
 # Ensure storage and cache are writable
 RUN chmod -R 775 storage bootstrap/cache
 
-# Use our custom entrypoint
-COPY scripts/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh && \
-    sed -i 's/\r$//' /usr/local/bin/entrypoint.sh
-
 # Expose the default PORT used by Render
 EXPOSE 8080
 
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+# CRITICAL FIX 2: The custom ENTRYPOINT and entrypoint.sh COPY commands have been completely deleted.
+# The container will now rely on the robust s6-overlay process manager built into the ServerSideUp image.
