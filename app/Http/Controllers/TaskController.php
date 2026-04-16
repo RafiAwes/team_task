@@ -41,6 +41,10 @@ class TaskController extends Controller
         // For now, since auth is removed, we treat the first user as the creator
         $creator = User::first();
         
+        if (!$creator) {
+            return redirect()->back()->with('error', 'No users found in database. Please seed the database.');
+        }
+
         $data = $request->validated();
         $data['creator_id'] = $creator->id;
 
@@ -60,6 +64,14 @@ class TaskController extends Controller
     {
         // Mock current user as the first user
         $user = User::first();
+        
+        if (!$user) {
+            return Inertia::render('my-tasks', [
+                'tasks' => ['data' => []],
+                'users' => [],
+            ]);
+        }
+
         $tasks = $this->taskService->getAllTasks()->where('assignee_id', $user->id);
         $users = User::all(['id', 'name', 'avatar_url']);
 

@@ -22,10 +22,10 @@ class UpdateTaskRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => ['sometimes', 'required', 'string', 'max:255'],
+            'title' => ['sometimes', 'nullable', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'status' => ['sometimes', 'required', 'string', 'in:pending,in-progress,completed'],
-            'priority' => ['sometimes', 'required', 'string', 'in:urgent,important,normal'],
+            'status' => ['sometimes', 'nullable', 'string', 'in:pending,in-progress,completed'],
+            'priority' => ['sometimes', 'nullable', 'string', 'in:urgent,important,normal'],
             'assignee_id' => ['nullable', 'exists:users,id'],
             'due_date' => ['nullable', 'date'],
         ];
