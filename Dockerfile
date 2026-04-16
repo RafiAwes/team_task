@@ -9,17 +9,17 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Build Backend
-FROM php:8.3-fpm-alpine AS build-backend
+FROM php:8.4-fpm-alpine AS build-backend
 WORKDIR /app
 COPY composer*.json ./
 RUN apk add --no-cache git unzip libzip-dev \
-    && docker-php-ext-install zip
+    && docker-php-ext-install zip pdo_mysql bcmath
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 COPY . .
 RUN composer install --no-dev --optimize-autoloader
 
 # Final Stage: Production Environment
-FROM serversideup/php:8.3-fpm-nginx AS final
+FROM serversideup/php:8.4-fpm-nginx AS final
 WORKDIR /var/www/html
 
 # Environment variables for production
