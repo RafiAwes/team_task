@@ -1,7 +1,7 @@
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutGrid, ListTodo, Bell, Settings, Search } from 'lucide-react';
+import { dashboard, tasksMine, notifications, settings } from '@/routes';
+import { LayoutGrid, CheckSquare, Bell, Settings2 } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import {
     Sidebar,
@@ -17,17 +17,17 @@ import type { NavItem } from '@/types';
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: route('dashboard'),
+        href: dashboard(),
         icon: LayoutGrid,
     },
     {
         title: 'My Tasks',
-        href: route('tasks.mine'),
-        icon: ListTodo,
+        href: tasksMine(),
+        icon: CheckSquare,
     },
     {
         title: 'Notifications',
-        href: route('notifications'),
+        href: notifications(),
         icon: Bell,
     },
 ];
@@ -35,8 +35,8 @@ const mainNavItems: NavItem[] = [
 const footerNavItems: NavItem[] = [
     {
         title: 'Settings',
-        href: route('settings'),
-        icon: Settings,
+        href: settings(),
+        icon: Settings2,
     },
 ];
 
@@ -49,7 +49,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild className="hover:bg-cyan-accent/10">
-                            <Link href={route('dashboard')}>
+                            <Link href={dashboard()}>
                                 <AppLogo />
                             </Link>
                         </SidebarMenuButton>

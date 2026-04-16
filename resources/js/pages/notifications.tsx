@@ -1,6 +1,7 @@
 import { Head } from '@inertiajs/react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { notifications as notificationsRoute } from '@/routes';
 import DashboardLayout from '@/layouts/dashboard-layout';
-import { motion } from 'framer-motion';
 
 interface Notification {
     id: number;
@@ -10,14 +11,14 @@ interface Notification {
     time: string;
 }
 
-interface Props {
+interface NotificationsProps {
     notifications: Notification[];
 }
 
-export default function Notifications({ notifications }: Props) {
+export default function Notifications({ notifications }: NotificationsProps) {
     return (
         <DashboardLayout 
-            breadcrumbs={[{ title: 'Notifications', href: route('notifications') }]}
+            breadcrumbs={[{ title: 'Notifications', href: notificationsRoute() }]}
         >
             <Head title="Notifications" />
             
@@ -28,28 +29,31 @@ export default function Notifications({ notifications }: Props) {
                 </header>
 
                 <div className="flex flex-col gap-4">
-                    {notifications.map((n, i) => (
-                        <motion.div 
-                            key={n.id}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: i * 0.1 }}
-                            className="glass p-4 rounded-2xl flex items-start gap-4 hover:border-cyan-accent/30 transition-all border border-transparent"
-                        >
-                            <div className="avatar w-10 h-10 ring-2 ring-cyan-accent/10 shrink-0">
-                                {n.user.split(' ').map(s => s[0]).join('')}
-                            </div>
-                            <div className="flex-1">
-                                <p className="text-sm text-text-main">
-                                    <span className="font-bold text-cyan-accent">{n.user}</span> 
-                                    {n.type === 'comment' ? ' commented on ' : ' updated status of '}
-                                    <span className="font-semibold text-purple-accent">"{n.task}"</span>
-                                </p>
-                                <p className="text-[11px] text-text-muted mt-1">{n.time}</p>
-                            </div>
-                            <div className="ai-btn">New</div>
-                        </motion.div>
-                    ))}
+                    <AnimatePresence>
+                        {notifications.map((n, i) => (
+                            <motion.div 
+                                key={n.id}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                exit={{ opacity: 0, x: 20 }}
+                                transition={{ delay: i * 0.1 }}
+                                className="glass p-4 rounded-2xl flex items-start gap-4 hover:border-cyan-accent/30 transition-all border border-transparent"
+                            >
+                                <div className="w-10 h-10 rounded-full bg-cyan-accent/10 flex items-center justify-center text-cyan-accent font-bold ring-2 ring-cyan-accent/10 shrink-0">
+                                    {n.user.split(' ').map(s => s[0]).join('')}
+                                </div>
+                                <div className="flex-1">
+                                    <p className="text-sm text-text-main">
+                                        <span className="font-bold text-cyan-accent">{n.user}</span> 
+                                        {n.type === 'comment' ? ' commented on ' : ' updated status of '}
+                                        <span className="font-semibold text-purple-accent">"{n.task}"</span>
+                                    </p>
+                                    <p className="text-[11px] text-text-muted mt-1">{n.time}</p>
+                                </div>
+                                <div className="text-[10px] uppercase tracking-wider font-bold text-cyan-accent/50">New</div>
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
                     {notifications.length === 0 && (
                         <div className="glass p-12 rounded-2xl text-center text-text-muted italic">
                             No recent activity found.

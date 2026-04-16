@@ -1,15 +1,16 @@
 import { Head } from '@inertiajs/react';
+import { tasksMine } from '@/routes';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { KanbanBoard, Task } from '@/components/kanban/kanban-board';
 
-interface Props {
+interface MyTasksProps {
     tasks: Task[];
 }
 
-export default function MyTasks({ tasks }: Props) {
+export default function MyTasks({ tasks }: MyTasksProps) {
     return (
         <DashboardLayout 
-            breadcrumbs={[{ title: 'My Tasks', href: route('tasks.mine') }]}
+            breadcrumbs={[{ title: 'My Tasks', href: tasksMine() }]}
         >
             <Head title="My Tasks" />
             

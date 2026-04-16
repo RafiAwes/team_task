@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Head } from '@inertiajs/react';
+import { dashboard } from '@/routes';
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { KanbanBoard, Task } from '@/components/kanban/kanban-board';
 import { TaskModal } from '@/components/kanban/task-modal';
@@ -33,7 +34,7 @@ export default function Dashboard({ tasks: initialTasks, users }: Props) {
 
     return (
         <DashboardLayout 
-            breadcrumbs={[{ title: 'Dashboard', href: route('dashboard') }]}
+            breadcrumbs={[{ title: 'Dashboard', href: dashboard() }]}
         >
             <Head title="Dashboard" />
             
