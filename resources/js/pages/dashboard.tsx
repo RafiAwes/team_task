@@ -39,7 +39,7 @@ export default function Dashboard({ tasks: initialTasks, users }: Props) {
         >
             <Head title="Dashboard" />
             
-            <div className="flex flex-col gap-8 h-full">
+            <div className="flex flex-col gap-8 h-fit">
                 <header className="flex items-center justify-between">
                     <div>
                         <h1 className="text-2xl font-bold text-text-main tracking-tight">Team Overview</h1>

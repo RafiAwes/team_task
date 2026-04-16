@@ -167,7 +167,7 @@ export function KanbanBoard({ tasks: initialTasks, onView, onEdit }: KanbanBoard
             onDragOver={handleDragOver}
             onDragEnd={handleDragEnd}
         >
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full min-h-[500px]">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-fit min-h-[500px]">
                 {columns.map((column) => (
                     <KanbanColumn 
                         key={column.id} 
@@ -200,23 +200,23 @@ function KanbanColumn({ column, tasks, onView, onEdit }: { column: Column; tasks
     return (
         <div 
             ref={setNodeRef}
-            className="flex flex-col gap-4 h-full min-h-[500px] p-2 rounded-2xl bg-white/[0.02] border border-white/[0.05] transition-colors"
+            className="flex flex-col gap-4 h-fit min-h-[500px] min-w-[320px] max-w-[320px] p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05] transition-colors"
         >
-            <div className="column-header">
+            <div className="column-header shrink-0 pb-2 border-b border-white/[0.05]">
                 <div className="flex items-center gap-2">
                     <span className="text-text-main font-bold">{column.title}</span>
                     <span className="text-[10px] bg-white/10 px-2 py-0.5 rounded-full text-text-muted">{tasks.length}</span>
                 </div>
-                <button className="text-text-muted hover:text-cyan-accent transition-colors">+</button>
+                <button className="text-text-muted hover:text-cyan-accent transition-colors text-lg">+</button>
             </div>
             
             <SortableContext id={column.id} items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
-                <div className="flex-1 flex flex-col gap-3">
+                <div className="flex-1 flex flex-col gap-3 pb-10">
                     {tasks.map((task) => (
                         <SortableTaskCard key={task.id} task={task} onView={onView} onEdit={onEdit} />
                     ))}
                     {tasks.length === 0 && (
-                        <div className="flex-1 border-2 border-dashed border-white/[0.03] rounded-xl flex items-center justify-center text-text-muted text-[11px] italic">
+                        <div className="flex-1 border-2 border-dashed border-white/[0.03] rounded-xl flex items-center justify-center text-text-muted text-[11px] italic min-h-[120px]">
                             No tasks here
                         </div>
                     )}
