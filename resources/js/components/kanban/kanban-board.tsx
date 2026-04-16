@@ -98,12 +98,12 @@ export function KanbanBoard({ tasks: initialTasks, onView, onEdit }: KanbanBoard
             setTasks((prev) => {
                 const activeIndex = prev.findIndex((t) => t.id === activeId);
                 const overIndex = prev.findIndex((t) => t.id === overId);
-                
+
                 const updatedTasks = [...prev];
                 updatedTasks[activeIndex] = { ...activeTask, status: overTask.status };
                 return arrayMove(updatedTasks, activeIndex, overIndex);
             });
-        } 
+        }
         // If dropping over a column container itself
         else if (!overTask && columns.some(c => c.id === overId)) {
             if (activeTask.status !== overId) {
@@ -128,11 +128,11 @@ export function KanbanBoard({ tasks: initialTasks, onView, onEdit }: KanbanBoard
         const overId = over.id;
 
         const activeTaskInList = tasks.find((t) => t.id === activeId);
-        
+
         if (activeId !== overId) {
             const activeIndex = tasks.findIndex((t) => t.id === activeId);
             const overIndex = tasks.findIndex((t) => t.id === overId);
-            
+
             // Determine the new status
             const overTask = tasks.find((t) => t.id === overId);
             const newStatus = overTask ? overTask.status : (columns.find(c => c.id === overId)?.id as string);
@@ -156,16 +156,16 @@ export function KanbanBoard({ tasks: initialTasks, onView, onEdit }: KanbanBoard
 
     const filteredTasks = tasks.filter(t => {
         // 1. Text Search Filter
-        const matchesSearch = searchQuery === '' || 
-            t.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        const matchesSearch = searchQuery === '' ||
+            t.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             t.description.toLowerCase().includes(searchQuery.toLowerCase());
 
         // 2. Priority Filter (If any priorities are selected)
-        const matchesPriority = filters.priorities.length === 0 || 
+        const matchesPriority = filters.priorities.length === 0 ||
             filters.priorities.includes(t.priority);
 
         // 3. Assignee Filter (If any assignees are selected)
-        const matchesAssignee = filters.assignees.length === 0 || 
+        const matchesAssignee = filters.assignees.length === 0 ||
             (t.assignee && filters.assignees.includes(t.assignee.id));
 
         return matchesSearch && matchesPriority && matchesAssignee;
@@ -181,16 +181,16 @@ export function KanbanBoard({ tasks: initialTasks, onView, onEdit }: KanbanBoard
         >
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-fit min-h-[500px]">
                 {columns.map((column) => (
-                    <KanbanColumn 
-                        key={column.id} 
-                        column={column} 
-                        tasks={filteredTasks.filter(t => t.status === column.id)} 
+                    <KanbanColumn
+                        key={column.id}
+                        column={column}
+                        tasks={filteredTasks.filter(t => t.status === column.id)}
                         onView={onView}
                         onEdit={onEdit}
                     />
                 ))}
             </div>
-            
+
             <DragOverlay dropAnimation={{
                 sideEffects: defaultDropAnimationSideEffects({
                     styles: {
@@ -210,7 +210,7 @@ function KanbanColumn({ column, tasks, onView, onEdit }: { column: Column; tasks
     });
 
     return (
-        <div 
+        <div
             ref={setNodeRef}
             className="flex flex-col gap-4 h-fit min-h-[500px] min-w-[320px] max-w-[320px] p-4 rounded-2xl bg-white/[0.02] border border-white/[0.05] transition-colors"
         >
@@ -221,7 +221,7 @@ function KanbanColumn({ column, tasks, onView, onEdit }: { column: Column; tasks
                 </div>
                 <button className="text-text-muted hover:text-cyan-accent transition-colors text-lg">+</button>
             </div>
-            
+
             <SortableContext id={column.id} items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
                 <div className="flex-1 flex flex-col gap-3 pb-10">
                     {tasks.map((task) => (
@@ -310,18 +310,18 @@ function TaskCard({ task, isOverlay, onView, onEdit }: { task: Task; isOverlay?:
                     </div>
                     <h3 className="card-title">{task.title}</h3>
                 </div>
-                
-                <button 
+
+                <button
                     onPointerDown={(e) => e.stopPropagation()}
                     onClick={handleDelete}
                     className="p-1.5 rounded-lg text-text-muted hover:text-rose-500 hover:bg-rose-500/10 transition-all opacity-0 group-hover:opacity-100"
                     title="Delete task"
                 >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" y1="11" x2="10" y2="17" /><line x1="14" y1="11" x2="14" y2="17" /></svg>
                 </button>
             </div>
             <p className="card-desc mb-4 pointer-events-none">{task.description}</p>
-            
+
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className="flex -space-x-2">
@@ -331,9 +331,9 @@ function TaskCard({ task, isOverlay, onView, onEdit }: { task: Task; isOverlay?:
                             </div>
                         )}
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
-                        <button 
+                        <button
                             onPointerDown={(e) => e.stopPropagation()}
                             onClick={(e) => { e.stopPropagation(); onView?.(task); }}
                             className="text-[10px] font-bold text-text-muted hover:text-cyan-accent transition-colors uppercase tracking-wider"
@@ -341,7 +341,7 @@ function TaskCard({ task, isOverlay, onView, onEdit }: { task: Task; isOverlay?:
                             Details
                         </button>
                         <span className="w-1 h-1 rounded-full bg-white/10" />
-                        <button 
+                        <button
                             onPointerDown={(e) => e.stopPropagation()}
                             onClick={(e) => { e.stopPropagation(); onEdit?.(task); }}
                             className="text-[10px] font-bold text-text-muted hover:text-purple-accent transition-colors uppercase tracking-wider"
@@ -350,21 +350,21 @@ function TaskCard({ task, isOverlay, onView, onEdit }: { task: Task; isOverlay?:
                         </button>
                     </div>
                 </div>
-                
+
                 <div className="flex items-center gap-2 text-text-muted text-[10px]">
-                    <button 
+                    <button
                         onPointerDown={(e) => e.stopPropagation()}
                         onClick={(e) => { e.stopPropagation(); setShowComments(!showComments); }}
                         className="flex items-center gap-1.5 hover:text-cyan-accent transition-colors p-1 rounded-md hover:bg-white/5"
                     >
-                        <span className="text-base leading-none">💬</span> 
+                        <span className="text-base leading-none">💬</span>
                         <span className="font-medium">{task.comments?.length || 0}</span>
                     </button>
                 </div>
             </div>
 
             {showComments && (
-                <motion.div 
+                <motion.div
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     className="mt-4 pt-4 border-t border-border/10 overflow-hidden"
@@ -377,7 +377,7 @@ function TaskCard({ task, isOverlay, onView, onEdit }: { task: Task; isOverlay?:
                                         <span className="font-bold text-cyan-accent/80">{c.user}</span>
                                         <div className="flex items-center gap-2">
                                             <span className="text-[9px] opacity-40 font-medium tracking-tight uppercase leading-none">{c.created_at}</span>
-                                            <button 
+                                            <button
                                                 onClick={(e) => deleteComment(c.id, e)}
                                                 className="opacity-0 group-hover/comment:opacity-100 hover:text-rose-500 transition-all leading-none p-0.5"
                                             >
@@ -393,12 +393,13 @@ function TaskCard({ task, isOverlay, onView, onEdit }: { task: Task; isOverlay?:
                         )}
                     </div>
                     <div className="flex gap-2">
-                        <input 
-                            type="text" 
+                        <input
+                            type="text"
                             value={newComment}
                             onPointerDown={(e) => e.stopPropagation()}
                             onChange={(e) => setNewComment(e.target.value)}
                             onKeyDown={(e) => {
+                                e.stopPropagation();
                                 if (e.key === 'Enter') {
                                     e.preventDefault();
                                     postComment(e as any);
@@ -407,7 +408,7 @@ function TaskCard({ task, isOverlay, onView, onEdit }: { task: Task; isOverlay?:
                             placeholder="Add a comment..."
                             className="flex-1 glass text-[11px] px-3 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-accent/30 border-border/10 placeholder:text-text-muted/50"
                         />
-                        <button 
+                        <button
                             onPointerDown={(e) => e.stopPropagation()}
                             className="text-[10px] font-bold px-3 py-1.5 bg-cyan-accent/10 text-cyan-accent rounded-lg hover:bg-cyan-accent/20 border border-cyan-accent/20 transition-colors uppercase tracking-wider"
                             onClick={postComment}

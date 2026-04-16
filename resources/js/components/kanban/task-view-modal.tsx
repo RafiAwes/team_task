@@ -7,8 +7,8 @@ import {
     DialogFooter,
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Task } from './kanban-board';
 import { router } from '@inertiajs/react';
+import { Task } from './kanban-board';
 
 interface TaskViewModalProps {
     isOpen: boolean;
@@ -112,6 +112,7 @@ export function TaskViewModal({ isOpen, onClose, task }: TaskViewModalProps) {
                                 placeholder="Add to the discussion..."
                                 className="flex-1 glass text-xs px-4 py-2 rounded-xl focus:outline-none focus:ring-1 focus:ring-cyan-accent/30 border-border/10 placeholder:text-text-muted/50"
                                 onKeyDown={(e) => {
+                                    e.stopPropagation(); // BUG FIX: Prevent dnd-kit spacebar conflict
                                     if (e.key === 'Enter' && e.currentTarget.value.trim()) {
                                         router.post(`/tasks/${task.id}/comments`, {
                                             content: e.currentTarget.value
