@@ -66,13 +66,7 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter className="p-4 border-t border-slate-800/50">
-                <div className="p-4 rounded-xl bg-slate-950/50 border border-slate-800 flex flex-col gap-2">
-                    <div className="flex items-center gap-2">
-                        <div className="h-1.5 w-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_5px_rgba(34,211,238,0.8)]" />
-                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Protocol Active</span>
-                    </div>
-                    <p className="text-[11px] text-slate-400 font-medium">Dark Futuristic v1.0</p>
-                </div>
+                {/* Footer content removed per user request */}
             </SidebarFooter>
         </Sidebar>
     );
