@@ -61,9 +61,16 @@ class TaskController extends Controller
         // Mock current user as the first user
         $user = User::first();
         $tasks = $this->taskService->getAllTasks()->where('assignee_id', $user->id);
+        $users = User::all(['id', 'name', 'avatar_url']);
 
         return Inertia::render('my-tasks', [
             'tasks' => TaskResource::collection($tasks),
+            'users' => $users->map(fn($u) => [
+                'id' => $u->id,
+                'name' => $u->name,
+                'avatar' => $u->name[0],
+                'avatar_url' => $u->avatar_url,
+            ]),
         ]);
     }
 

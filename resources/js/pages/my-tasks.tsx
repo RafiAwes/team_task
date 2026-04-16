@@ -1,13 +1,25 @@
 import { Head } from '@inertiajs/react';
+import { useState } from 'react';
 
 import DashboardLayout from '@/layouts/dashboard-layout';
 import { KanbanBoard, Task } from '@/components/kanban/kanban-board';
+import { TaskModal } from '@/components/kanban/task-modal';
 
 interface MyTasksProps {
-    tasks: Task[];
+    tasks: { data: Task[] };
+    users: any[];
 }
 
-export default function MyTasks({ tasks }: MyTasksProps) {
+export default function MyTasks({ tasks: initialTasks, users }: MyTasksProps) {
+    const tasks = initialTasks.data;
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [editingTask, setEditingTask] = useState<Task | undefined>();
+
+    const handleEditTask = (task: Task) => {
+        setEditingTask(task);
+        setIsModalOpen(true);
+    };
+
     return (
         <DashboardLayout 
             breadcrumbs={[{ title: 'My Tasks', href: '/tasks' }]}
@@ -22,7 +34,14 @@ export default function MyTasks({ tasks }: MyTasksProps) {
                     </div>
                 </header>
 
-                <KanbanBoard tasks={tasks} />
+                <KanbanBoard tasks={tasks} onEdit={handleEditTask} />
+
+                <TaskModal 
+                    isOpen={isModalOpen}
+                    onClose={() => setIsModalOpen(false)}
+                    initialTask={editingTask}
+                    users={users}
+                />
             </div>
         </DashboardLayout>
     );
