@@ -55,7 +55,7 @@ interface KanbanBoardProps {
 }
 
 export function KanbanBoard({ tasks: initialTasks, onView, onEdit }: KanbanBoardProps) {
-    const { searchQuery } = useSearch();
+    const { searchQuery, filters } = useSearch();
     const [tasks, setTasks] = useState<Task[]>(initialTasks);
 
     useEffect(() => {
@@ -154,10 +154,22 @@ export function KanbanBoard({ tasks: initialTasks, onView, onEdit }: KanbanBoard
         setActiveTask(null);
     }
 
-    const filteredTasks = tasks.filter(t => 
-        t.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-        t.description.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredTasks = tasks.filter(t => {
+        // 1. Text Search Filter
+        const matchesSearch = searchQuery === '' || 
+            t.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
+            t.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+        // 2. Priority Filter (If any priorities are selected)
+        const matchesPriority = filters.priorities.length === 0 || 
+            filters.priorities.includes(t.priority);
+
+        // 3. Assignee Filter (If any assignees are selected)
+        const matchesAssignee = filters.assignees.length === 0 || 
+            (t.assignee && filters.assignees.includes(t.assignee.id));
+
+        return matchesSearch && matchesPriority && matchesAssignee;
+    });
 
     return (
         <DndContext

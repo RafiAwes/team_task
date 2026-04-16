@@ -5,6 +5,7 @@ import DashboardLayout from '@/layouts/dashboard-layout';
 import { KanbanBoard, Task } from '@/components/kanban/kanban-board';
 import { TaskModal } from '@/components/kanban/task-modal';
 import { TaskViewModal } from '@/components/kanban/task-view-modal';
+import { FilterPopover } from '@/components/kanban/filter-popover';
 
 interface MyTasksProps {
     tasks: { data: Task[] };
@@ -39,6 +40,9 @@ export default function MyTasks({ tasks: initialTasks, users }: MyTasksProps) {
                     <div>
                         <h1 className="text-2xl font-bold text-text-main tracking-tight">My Assigned Tasks</h1>
                         <p className="text-text-muted text-sm mt-1">Focus on what matters to you today.</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <FilterPopover users={users} />
                     </div>
                 </header>
 

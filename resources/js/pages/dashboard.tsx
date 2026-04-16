@@ -5,6 +5,7 @@ import DashboardLayout from '@/layouts/dashboard-layout';
 import { KanbanBoard, Task } from '@/components/kanban/kanban-board';
 import { TaskModal } from '@/components/kanban/task-modal';
 import { TaskViewModal } from '@/components/kanban/task-view-modal';
+import { FilterPopover } from '@/components/kanban/filter-popover';
 
 interface Props {
     tasks: { data: Task[] }; // From TaskResource::collection
@@ -47,7 +48,7 @@ export default function Dashboard({ tasks: initialTasks, users }: Props) {
                     </div>
                     
                     <div className="flex items-center gap-3">
-                        <button className="btn-secondary text-sm">Filters</button>
+                        <FilterPopover users={users} />
                         <button onClick={handleCreateTask} className="btn-create">+ Create Task</button>
                     </div>
                 </header>
