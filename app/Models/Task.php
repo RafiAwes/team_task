@@ -14,25 +14,16 @@ class Task extends Model
     /** @use HasFactory<\Database\Factories\TaskFactory> */
     use HasFactory;
 
-    /**
-     * Get the comments for the task.
-     */
     public function comments(): HasMany
     {
         return $this->hasMany(Comment::class)->latest();
     }
 
-    /**
-     * Get the user that the task is assigned to.
-     */
     public function assignee(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assignee_id');
     }
 
-    /**
-     * Get the user that created the task.
-     */
     public function creator(): BelongsTo
     {
         return $this->belongsTo(User::class, 'creator_id');

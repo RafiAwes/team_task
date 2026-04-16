@@ -1,0 +1,11 @@
+.env
+node_modules
+vendor
+public/build
+storage/*.key
+.git
+.github
+.phpunit.cache
+tests
+Dockerfile
+render.yaml

@@ -38,7 +38,6 @@ class TaskController extends Controller
 
     public function store(StoreTaskRequest $request)
     {
-        // For now, since auth is removed, we treat the first user as the creator
         $creator = User::first();
         
         if (!$creator) {
@@ -69,7 +68,6 @@ class TaskController extends Controller
 
     public function myTasks()
     {
-        // Mock current user as the first user
         $user = User::first();
         
         if (!$user) {

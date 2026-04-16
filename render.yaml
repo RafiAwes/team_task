@@ -1,0 +1,31 @@
+services:
+  - type: web
+    name: team-task
+    env: docker
+    plan: free # Change to starter or higher for better performance
+    region: singapore # Adjust based on your TiDB region
+    healthCheckPath: /
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_KEY
+        fromContext: "static" # You must set this in Render Dashboard manually or here if you have it
+      - key: DB_CONNECTION
+        value: mysql
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: "4000"
+      - key: DB_DATABASE
+        value: teamtask
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: SESSION_DRIVER
+        value: cookie
+      - key: LOG_CHANNEL
+        value: stderr

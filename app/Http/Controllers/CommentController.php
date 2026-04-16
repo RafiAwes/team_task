@@ -10,16 +10,12 @@ use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
-    /**
-     * Store a newly created comment in storage.
-     */
     public function store(Request $request, Task $task)
     {
         $request->validate([
             'content' => 'required|string|max:1000',
         ]);
 
-        // Mock current user
         $user = User::first();
         
         if (!$user) {
@@ -31,15 +27,11 @@ class CommentController extends Controller
             'content' => $request->input('content'),
         ]);
 
-        // Notify system of the comment
         $user->notify(new TaskActivity($user, $task->title, 'commented'));
 
         return redirect()->back()->with('success', 'Comment added.');
     }
 
-    /**
-     * Remove the specified comment from storage.
-     */
     public function destroy(Comment $comment)
     {
         $comment->delete();
