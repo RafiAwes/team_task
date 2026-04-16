@@ -1,6 +1,8 @@
 # Stage 1: Build Frontend
-FROM node:20-alpine AS build-frontend
+FROM node:20-slim AS build-frontend
 WORKDIR /app
+# Install build tools for native modules (needed by some Tailwind/Vite plugins)
+RUN apt-get update && apt-get install -y build-essential python3 && rm -rf /var/lib/apt/lists/*
 COPY package*.json ./
 RUN npm install
 COPY . .
