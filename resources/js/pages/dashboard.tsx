@@ -20,7 +20,10 @@ export default function Dashboard({ tasks: initialTasks, users }: Props) {
         setIsModalOpen(true);
     };
 
-    // Removed handleSaveTask as Inertia's useForm will handle the refresh
+    const handleEditTask = (task: Task) => {
+        setEditingTask(task);
+        setIsModalOpen(true);
+    };
 
     return (
         <DashboardLayout 
@@ -41,7 +44,7 @@ export default function Dashboard({ tasks: initialTasks, users }: Props) {
                     </div>
                 </header>
 
-                <KanbanBoard tasks={tasks} />
+                <KanbanBoard tasks={tasks} onEdit={handleEditTask} />
 
                 <TaskModal 
                     isOpen={isModalOpen}

@@ -48,15 +48,17 @@ export interface Task {
 
 interface KanbanBoardProps {
     tasks: Task[];
+    onEdit?: (task: Task) => void;
 }
 
-export function KanbanBoard({ tasks: initialTasks }: KanbanBoardProps) {
+export function KanbanBoard({ tasks: initialTasks, onEdit }: KanbanBoardProps) {
     const { searchQuery } = useSearch();
     const [tasks, setTasks] = useState<Task[]>(initialTasks);
 
     useEffect(() => {
         setTasks(initialTasks);
     }, [initialTasks]);
+
     // ... rest of the component
     const [activeTask, setActiveTask] = useState<Task | null>(null);
 
@@ -123,7 +125,7 @@ export function KanbanBoard({ tasks: initialTasks }: KanbanBoardProps) {
             const activeIndex = tasks.findIndex((t) => t.id === active.id);
             const overIndex = tasks.findIndex((t) => t.id === over.id);
             
-            if (tasks[activeIndex].status === tasks[overIndex]?.status) {
+            if (activeIndex > -1 && overIndex > -1 && tasks[activeIndex].status === tasks[overIndex]?.status) {
                 setTasks((items) => arrayMove(items, activeIndex, overIndex));
             }
         }
@@ -150,6 +152,7 @@ export function KanbanBoard({ tasks: initialTasks }: KanbanBoardProps) {
                         key={column.id} 
                         column={column} 
                         tasks={filteredTasks.filter(t => t.status === column.id)} 
+                        onEdit={onEdit}
                     />
                 ))}
             </div>
@@ -167,7 +170,7 @@ export function KanbanBoard({ tasks: initialTasks }: KanbanBoardProps) {
     );
 }
 
-function KanbanColumn({ column, tasks }: { column: Column; tasks: Task[] }) {
+function KanbanColumn({ column, tasks, onEdit }: { column: Column; tasks: Task[]; onEdit?: (task: Task) => void }) {
     const { setNodeRef } = useDroppable({
         id: column.id,
     });
@@ -188,7 +191,7 @@ function KanbanColumn({ column, tasks }: { column: Column; tasks: Task[] }) {
             <SortableContext id={column.id} items={tasks.map(t => t.id)} strategy={verticalListSortingStrategy}>
                 <div className="flex-1 flex flex-col gap-3">
                     {tasks.map((task) => (
-                        <SortableTaskCard key={task.id} task={task} />
+                        <SortableTaskCard key={task.id} task={task} onEdit={onEdit} />
                     ))}
                     {tasks.length === 0 && (
                         <div className="flex-1 border-2 border-dashed border-white/[0.03] rounded-xl flex items-center justify-center text-text-muted text-[11px] italic">
@@ -201,7 +204,7 @@ function KanbanColumn({ column, tasks }: { column: Column; tasks: Task[] }) {
     );
 }
 
-function SortableTaskCard({ task }: { task: Task }) {
+function SortableTaskCard({ task, onEdit }: { task: Task; onEdit?: (task: Task) => void }) {
     const {
         attributes,
         listeners,
@@ -219,12 +222,12 @@ function SortableTaskCard({ task }: { task: Task }) {
 
     return (
         <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-            <TaskCard task={task} />
+            <TaskCard task={task} onEdit={onEdit} />
         </div>
     );
 }
 
-function TaskCard({ task, isOverlay }: { task: Task; isOverlay?: boolean }) {
+function TaskCard({ task, isOverlay, onEdit }: { task: Task; isOverlay?: boolean; onEdit?: (task: Task) => void }) {
     const [showComments, setShowComments] = useState(false);
     const [newComment, setNewComment] = useState('');
 
@@ -243,25 +246,36 @@ function TaskCard({ task, isOverlay }: { task: Task; isOverlay?: boolean }) {
                     </div>
                     <h3 className="card-title">{task.title}</h3>
                 </div>
-                <div className="ai-btn flex-shrink-0">AI</div>
             </div>
             <p className="card-desc mb-4 pointer-events-none">{task.description}</p>
             
             <div className="flex items-center justify-between">
-                <div className="flex -space-x-2">
-                    {task.assignee && (
-                        <div className="avatar ring-2 ring-bg">
-                            {task.assignee.avatar}
-                        </div>
-                    )}
+                <div className="flex items-center gap-3">
+                    <div className="flex -space-x-2">
+                        {task.assignee && (
+                            <div className="avatar ring-2 ring-bg">
+                                {task.assignee.avatar}
+                            </div>
+                        )}
+                    </div>
+                    
+                    <button 
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onClick={(e) => { e.stopPropagation(); onEdit?.(task); }}
+                        className="text-[10px] font-bold text-text-muted hover:text-white transition-colors uppercase tracking-wider bg-white/5 px-2 py-1 rounded-md border border-white/5 active:scale-95"
+                    >
+                        Details
+                    </button>
                 </div>
                 
                 <div className="flex items-center gap-2 text-text-muted text-[10px]">
                     <button 
+                        onPointerDown={(e) => e.stopPropagation()}
                         onClick={(e) => { e.stopPropagation(); setShowComments(!showComments); }}
-                        className="flex items-center gap-1 hover:text-cyan-accent active:scale-95 transition-all"
+                        className="flex items-center gap-1.5 hover:text-cyan-accent transition-colors p-1 rounded-md hover:bg-white/5"
                     >
-                        💬 {task.comments?.length || 0}
+                        <span className="text-base leading-none">💬</span> 
+                        <span className="font-medium">{task.comments?.length || 0}</span>
                     </button>
                 </div>
             </div>
@@ -272,23 +286,30 @@ function TaskCard({ task, isOverlay }: { task: Task; isOverlay?: boolean }) {
                     animate={{ height: 'auto', opacity: 1 }}
                     className="mt-4 pt-4 border-t border-border/10 overflow-hidden"
                 >
-                    <div className="flex flex-col gap-2 mb-3 max-h-[100px] overflow-y-auto pr-1 custom-scrollbar">
-                        {task.comments.map((c, i) => (
-                            <div key={i} className="text-[10px] text-text-muted bg-white/5 p-2 rounded-lg">
-                                <span className="font-bold text-cyan-accent">{c.user}:</span> {c.text}
-                            </div>
-                        ))}
+                    <div className="flex flex-col gap-2.5 mb-4 max-h-[120px] overflow-y-auto pr-1 custom-scrollbar">
+                        {task.comments && task.comments.length > 0 ? (
+                            task.comments.map((c, i) => (
+                                <div key={i} className="text-[11px] text-text-muted bg-white/[0.03] p-2.5 rounded-xl border border-white/[0.05]">
+                                    <span className="font-bold text-cyan-accent/80 mr-1.5">{c.user}:</span> 
+                                    <span className="text-text-main/90">{c.text}</span>
+                                </div>
+                            ))
+                        ) : (
+                            <div className="text-[10px] text-text-muted italic px-2">No comments yet...</div>
+                        )}
                     </div>
                     <div className="flex gap-2">
                         <input 
                             type="text" 
                             value={newComment}
+                            onPointerDown={(e) => e.stopPropagation()}
                             onChange={(e) => setNewComment(e.target.value)}
                             placeholder="Add a comment..."
-                            className="flex-1 glass text-[10px] px-2 py-1 rounded focus:outline-none focus:ring-1 focus:ring-cyan-accent/30"
+                            className="flex-1 glass text-[11px] px-3 py-1.5 rounded-lg focus:outline-none focus:ring-1 focus:ring-cyan-accent/30 border-border/10 placeholder:text-text-muted/50"
                         />
                         <button 
-                            className="text-[10px] px-2 py-1 bg-cyan-accent/10 text-cyan-accent rounded hover:bg-cyan-accent/20"
+                            onPointerDown={(e) => e.stopPropagation()}
+                            className="text-[10px] font-bold px-3 py-1.5 bg-cyan-accent/10 text-cyan-accent rounded-lg hover:bg-cyan-accent/20 border border-cyan-accent/20 transition-colors uppercase tracking-wider"
                             onClick={(e) => { e.stopPropagation(); setNewComment(''); }}
                         >
                             Post
