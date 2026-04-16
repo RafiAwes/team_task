@@ -20,6 +20,7 @@ import {
     useSortable,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Column {
     id: string;
@@ -202,13 +203,16 @@ function SortableTaskCard({ task }: { task: Task }) {
 }
 
 function TaskCard({ task, isOverlay }: { task: Task; isOverlay?: boolean }) {
+    const [showComments, setShowComments] = useState(false);
+    const [newComment, setNewComment] = useState('');
+
     return (
-        <div className={`glass glass-hover p-4 rounded-xl cursor-grab active:cursor-grabbing ${isOverlay ? 'shadow-2xl border-cyan-accent/50 scale-105' : ''}`}>
-            <div className="flex justify-between items-start mb-2">
+        <div className={`glass glass-hover p-4 rounded-xl cursor-grab active:cursor-grabbing transition-all ${isOverlay ? 'shadow-2xl border-cyan-accent/50 scale-105' : ''}`}>
+            <div className="flex justify-between items-start mb-2 pointer-events-none">
                 <h3 className="card-title">{task.title}</h3>
                 <div className="ai-btn">AI</div>
             </div>
-            <p className="card-desc mb-4">{task.description}</p>
+            <p className="card-desc mb-4 pointer-events-none">{task.description}</p>
             
             <div className="flex items-center justify-between">
                 <div className="flex -space-x-2">
@@ -218,11 +222,45 @@ function TaskCard({ task, isOverlay }: { task: Task; isOverlay?: boolean }) {
                 </div>
                 
                 <div className="flex items-center gap-2 text-text-muted text-[10px]">
-                    <span className="flex items-center gap-1">
+                    <button 
+                        onClick={(e) => { e.stopPropagation(); setShowComments(!showComments); }}
+                        className="flex items-center gap-1 hover:text-cyan-accent active:scale-95 transition-all"
+                    >
                         💬 {task.comments?.length || 0}
-                    </span>
+                    </button>
                 </div>
             </div>
+
+            {showComments && (
+                <motion.div 
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    className="mt-4 pt-4 border-t border-border/10 overflow-hidden"
+                >
+                    <div className="flex flex-col gap-2 mb-3 max-h-[100px] overflow-y-auto pr-1 custom-scrollbar">
+                        {task.comments.map((c, i) => (
+                            <div key={i} className="text-[10px] text-text-muted bg-white/5 p-2 rounded-lg">
+                                <span className="font-bold text-cyan-accent">{c.user}:</span> {c.text}
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex gap-2">
+                        <input 
+                            type="text" 
+                            value={newComment}
+                            onChange={(e) => setNewComment(e.target.value)}
+                            placeholder="Add a comment..."
+                            className="flex-1 glass text-[10px] px-2 py-1 rounded focus:outline-none focus:ring-1 focus:ring-cyan-accent/30"
+                        />
+                        <button 
+                            className="text-[10px] px-2 py-1 bg-cyan-accent/10 text-cyan-accent rounded hover:bg-cyan-accent/20"
+                            onClick={(e) => { e.stopPropagation(); setNewComment(''); }}
+                        >
+                            Post
+                        </button>
+                    </div>
+                </motion.div>
+            )}
         </div>
     );
 }
