@@ -60,6 +60,13 @@ class TaskController extends Controller
         return redirect()->back()->with('success', 'Task updated successfully.');
     }
 
+    public function destroy(Task $task)
+    {
+        $this->taskService->deleteTask($task);
+
+        return redirect()->back()->with('success', 'Task deleted successfully.');
+    }
+
     public function myTasks()
     {
         // Mock current user as the first user

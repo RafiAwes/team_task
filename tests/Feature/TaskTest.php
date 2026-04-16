@@ -91,3 +91,14 @@ test('drag and drop status update works', function () {
         'status' => 'completed',
     ]);
 });
+
+test('a task can be deleted', function () {
+    $task = Task::factory()->create();
+
+    $response = $this->delete(route('tasks.destroy', $task));
+
+    $response->assertRedirect();
+    $this->assertDatabaseMissing('tasks', [
+        'id' => $task->id,
+    ]);
+});
