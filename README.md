@@ -58,7 +58,7 @@ Follow these steps to get the environment running on your local machine.
 
 1. **Clone the repository:**
    ```bash
-   git clone <repository-url>
+   git clone https://github.com/RafiAwes/team_task.git
    cd task_manager
    ```
 
