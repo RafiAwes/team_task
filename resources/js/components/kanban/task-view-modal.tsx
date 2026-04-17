@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
     Dialog,
     DialogContent,
@@ -17,7 +17,29 @@ interface TaskViewModalProps {
 }
 
 export function TaskViewModal({ isOpen, onClose, task }: TaskViewModalProps) {
+    const [comment, setComment] = useState('');
+    const [isPosting, setIsPosting] = useState(false);
+
     if (!task) return null;
+
+    const handlePostComment = () => {
+        if (!comment.trim() || isPosting) return;
+
+        setIsPosting(true);
+        router.post(`/tasks/${task.id}/comments`, {
+            content: comment.trim()
+        }, {
+            preserveScroll: true,
+            onSuccess: () => {
+                setComment('');
+                setIsPosting(false);
+            },
+            onError: () => {
+                setIsPosting(false);
+            }
+        });
+    };
+
 
     const priorityColors = {
         urgent: 'bg-rose-500/10 text-rose-500 border-rose-500/20 shadow-[0_0_10px_rgba(244,63,94,0.1)]',
@@ -111,18 +133,23 @@ export function TaskViewModal({ isOpen, onClose, task }: TaskViewModalProps) {
                                 type="text" 
                                 placeholder="Add to the discussion..."
                                 className="flex-1 glass text-xs px-4 py-2 rounded-xl focus:outline-none focus:ring-1 focus:ring-cyan-accent/30 border-border/10 placeholder:text-text-muted/50"
+                                value={comment}
+                                onChange={(e) => setComment(e.target.value)}
+                                disabled={isPosting}
                                 onKeyDown={(e) => {
-                                    e.stopPropagation();
-                                    if (e.key === 'Enter' && e.currentTarget.value.trim()) {
-                                        router.post(`/tasks/${task.id}/comments`, {
-                                            content: e.currentTarget.value
-                                        }, {
-                                            preserveScroll: true,
-                                            onSuccess: () => (e.currentTarget.value = ''),
-                                        });
+                                    if (e.key === 'Enter') {
+                                        e.preventDefault();
+                                        handlePostComment();
                                     }
                                 }}
                             />
+                            <button 
+                                onClick={handlePostComment}
+                                disabled={!comment.trim() || isPosting}
+                                className="px-4 py-2 rounded-xl bg-cyan-accent/20 text-cyan-accent text-xs font-bold hover:bg-cyan-accent/30 disabled:opacity-50 transition-all border border-cyan-accent/20"
+                            >
+                                {isPosting ? '...' : 'Post'}
+                            </button>
                         </div>
                     </div>
                 </div>
